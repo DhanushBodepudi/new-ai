@@ -2,16 +2,19 @@ import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# Initialize environment variables for the cloud loader
+load_dotenv()
 
 app = FastAPI(title="Hackathon Human-Like AI Endpoint")
 
-# Directly pasting your key solves the Windows credential issues instantly
+# Directly pasting your key solves credentials checking instantly
 client = OpenAI(api_key="sk-proj-YOUR_REAL_OPENAI_KEY")
 
 class ChatRequest(BaseModel):
     message: str
 
-# System prompt forces the LLM to behave like a casual human chat partner
 HUMAN_SYSTEM_PROMPT = (
     "You are a human chatting casually with a friend. "
     "Guidelines:\n"
@@ -34,7 +37,7 @@ async def chat_endpoint(request: ChatRequest):
                 {"role": "system", "content": HUMAN_SYSTEM_PROMPT},
                 {"role": "user", "content": request.message}
             ],
-            temperature=0.85 # Higher temperature makes it more creative and human
+            temperature=0.85
         )
         return {"response": response.choices.message.content}
     except Exception as e:
